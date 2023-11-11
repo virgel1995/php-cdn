@@ -2,9 +2,9 @@
 set_time_limit(0);
 ini_set('memory_limit', '2048M');
 $process_urls = array(
-    'download' => '/cdn/download',
-    'view' => '/cdn/view',
-    'upload' => '/cdn/upload/index.php',
+    'download' => '/cdn/mysql/download',
+    'view' => '/cdn/mysql/view',
+    'upload' => '/cdn/mysql/upload/index.php',
 );
 $targetDirectory = "../uploads/";
 $allowedBase64 = array('images', 'pdf');
