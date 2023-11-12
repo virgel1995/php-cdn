@@ -27,19 +27,21 @@ if (isset($_GET['file'])) {
                     $formatedSize = formatBytes($file_size);
                     http_response_code(200);
                     header('Content-Type: application/json');
-                    echo json_encode(array(
-                        "status" => "success",
-                        "message" => "File fetched Successfully",
-                        "data" => array(
-                            "size" => $formatedSize,
-                            "mime_type" => $img_type,
-                            "type" => $file_type,
-                            "file" => 'data:' . $img_type . ';base64,' . $file,
+                    echo json_encode(
+                        array(
+                            "status" => "success",
+                            "message" => "File fetched Successfully",
+                            "data" => array(
+                                "size" => $formatedSize,
+                                "mime_type" => $img_type,
+                                "type" => $file_type,
+                                "file" => 'data:' . $img_type . ';base64,' . $file,
+                            )
                         )
-                    ));
+                    );
                 } elseif ($download === 'true') {
-                    header('Content-Type: application/octet-stream');
-                    header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
+                    header('Content-Type: application/octet-stream') or die("Could not send header...");
+                    header('Content-Disposition: attachment; filename="' . $row['original_name'] . '"');
                     header('Content-Length: ' . filesize($filePath));
                     readfile($filePath);
                 } else {
@@ -47,36 +49,63 @@ if (isset($_GET['file'])) {
                     header("Content-Type: " . mime_content_type($filePath));
                     readfile($filePath, false);
                 }
-            }
-            elseif (in_array($file_type, $mediaFiles)) {
+            } elseif (in_array($file_type, $mediaFiles)) {
                 header("Cache-Control: no-cache");
                 header("Cache-Control: public, must-revalidate, post-check=0, pre-check=0");
-                header('Content-Type: application/octet-stream');
-                header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
+                header('Content-Type: application/octet-stream') or die("Could not send header...");
+                header('Content-Disposition: attachment; filename="' . $row['original_name'] . '"');
                 header('Content-Length: ' . filesize($filePath));
                 readfile($filePath);
+            } elseif (in_array($file_type, $applications)) {
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="' . $row['original_name'] . '"');
+                header('Content-Length: ' . filesize($filePath));
+                $file = fopen($filePath, "rb");
+                while (!feof($file)) {
+                    print(fread($file, 1024 * 8)); // Adjust the buffer size as needed
+                    ob_flush();
+                    flush();
+                }
+                fclose($file);
+            } else {
+                // Handle case where file type is not allowed
+                http_response_code(403);
+                header('Content-Type: application/json');
+                echo json_encode(
+                    array(
+                        "status" => "error",
+                        "message" => "File type not allowed.",
+                    )
+                );
+
             }
         } else {
             http_response_code(404);
             header('Content-Type: application/json');
-            echo json_encode(array(
-                "status" => "error",
-                "message" => "File Not Found",
-            ));
+            echo json_encode(
+                array(
+                    "status" => "error",
+                    "message" => "File Not Found",
+                )
+            );
         }
     } else {
         http_response_code(404);
         header('Content-Type: application/json');
-        echo json_encode(array(
-            "status" => "error",
-            "message" => "file Not Found",
-        ));
+        echo json_encode(
+            array(
+                "status" => "error",
+                "message" => "file Not Found",
+            )
+        );
     }
 } else {
     http_response_code(400);
     header('Content-Type: application/json');
-    echo json_encode(array(
-        "status" => "error",
-        "message" => "file Query is Required",
-    ));
+    echo json_encode(
+        array(
+            "status" => "error",
+            "message" => "file Query is Required",
+        )
+    );
 }

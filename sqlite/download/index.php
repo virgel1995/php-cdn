@@ -10,10 +10,18 @@ if (isset($_GET['download'])) {
 }
 if (isset($_GET['file'])) {
     $fileId = $_GET['file'];
-    $sql = "SELECT * FROM `$db_name`.`files` WHERE id=$fileId;";
-    $result = $connection->query($sql);
-    if ($result) {
-        $row = $result->fetch_assoc();
+    $row = findFileById($fileId);
+    if (!$row) {
+        http_response_code(404);
+        header('Content-Type: application/json');
+        echo json_encode(
+            array(
+                "status" => "error",
+                "message" => "file Not Found",
+            )
+        );
+        exit();
+    } else {
         $filePath = $targetDirectory . $row['path'];
         if (file_exists($filePath)) {
             $file_type = $row['type'];
@@ -31,11 +39,11 @@ if (isset($_GET['file'])) {
                             "status" => "success",
                             "message" => "File fetched Successfully",
                             "data" => array(
-                                "size" => $formatedSize,
-                                "mime_type" => $img_type,
-                                "type" => $file_type,
-                                "file" => 'data:' . $img_type . ';base64,' . $file,
-                            )
+                                    "size" => $formatedSize,
+                                    "mime_type" => $img_type,
+                                    "type" => $file_type,
+                                    "file" => 'data:' . $img_type . ';base64,' . $file,
+                                )
                         )
                     );
                 } elseif ($download === 'true') {
@@ -88,15 +96,6 @@ if (isset($_GET['file'])) {
                 )
             );
         }
-    } else {
-        http_response_code(404);
-        header('Content-Type: application/json');
-        echo json_encode(
-            array(
-                "status" => "error",
-                "message" => "file Not Found",
-            )
-        );
     }
 } else {
     http_response_code(400);

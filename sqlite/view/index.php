@@ -5,21 +5,12 @@ $type = '';
 $error = '';
 if (isset($_GET['file'])) {
     $fileId = $_GET['file'];
-    $row = findById($fileId);
+    $row = findFileById($fileId);
     if (!$row) {
         $error = array(
             "status" => "error",
             "message" => "file Not Found",
         );
-        // http_response_code(404);
-        // header('Content-Type: application/json');
-        // echo json_encode(
-        //     array(
-        //         "status" => "error",
-        //         "message" => "file Not Found",
-        //     )
-        // );
-        // exit;
     } else {
         $type = $row['type'];
     }
