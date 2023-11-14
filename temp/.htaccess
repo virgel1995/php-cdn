@@ -1,0 +1,28 @@
+# ============ https ============
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    # ============ Headers settings ============
+    SetEnvIf Origin "http(s)?://(localhost|127.0.0.1)(:[0-9]+)?$" AccessControlAllowOrigin=$0
+    Header add Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
+
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
+    Header set Access-Control-Allow-Headers "Authorization, Content-Type, X-Requested-With"
+
+    # ============ Cache Disable  ============
+    Header set Cache-Control "private, no-cache, no-store, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+Options -Indexes

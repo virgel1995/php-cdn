@@ -1,4 +1,5 @@
 <?php
+include_once("../config.php");
 $fileId = '';
 $error = '';
 
@@ -32,7 +33,7 @@ if (isset($_GET['file'])) {
                                 echo '';
                             }
                             ?>;" id="video1" autoplay controls>
-        <source src="http://localhost/cdn/download/?file=<?php echo $fileId ?>" type="video/mp4">
+        <source src="http://localhost/<?php echo $process_urls['download'] ?>/?file=<?php echo $fileId ?>" type="video/mp4">
     </video>
 </body>
 

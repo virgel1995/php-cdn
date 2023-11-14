@@ -5,43 +5,8 @@ if (isset($_FILES['file'])) {
     if ($_FILES['file']['error'] === UPLOAD_ERR_OK) { // Check for upload error
         // Determine the file type
         $fileType = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
-        $subDirectory = '';
-        $folderType = '';
-        // Check the file type and assign a subdirectory accordingly
-        if (in_array($fileType, array('jpg', 'jpeg', 'png', 'gif'))) {
-            $subDirectory = 'images/';
-            $folderType = 'images';
-        } elseif (in_array($fileType, array('mp4', 'avi', 'mkv'))) {
-            $subDirectory = 'video/';
-            $folderType = 'video';
-        } elseif (in_array($fileType, array('mp3', 'wav'))) {
-            $subDirectory = 'audio/';
-            $folderType = 'audio';
-        } 
-        elseif (in_array($fileType, array('pdf'))) {
-            $subDirectory = 'pdf/';
-            $folderType = 'pdf';
-        }
-        elseif (in_array($fileType, array('docx' , 'doc'))) {
-            $subDirectory = 'word/';
-            $folderType = 'word';
-        }
-         elseif (in_array($fileType, array('xla','xlsx', 'xlc', 'xlm', 'xls', 'xlt', 'xlw'))) {
-            $subDirectory = 'excel/';
-            $folderType = 'excel';
-        } 
-         elseif (in_array($fileType, array('zip', 'rar', 'z', 'tgz', 'tar'))) {
-            $subDirectory = 'compress/';
-            $folderType = 'compress';
-        } 
-         elseif (in_array($fileType, array('exe'))) {
-            $subDirectory = 'desktop-app/';
-            $folderType = 'desktop-app';
-        } 
-        else {
-            $subDirectory = 'other/';
-            $folderType = 'other';
-        }
+        $subDirectory = process_SubDirectory($fileType);
+        $folderType = str_replace('/', '', $subDirectory);
 
         // Create the target directory if it doesn't exist
         if (!file_exists($targetDirectory . $subDirectory)) {
@@ -50,14 +15,16 @@ if (isset($_FILES['file'])) {
 
         // Generate a unique filename using UUIDv4
         $genreated_name =  uniqid(prefix: true, more_entropy: true) . '-' . bin2hex(random_bytes(24)) . '.' . $fileType;
+        $original_name = $_FILES['file']['name'];
         $uniqueFileName = $subDirectory . $genreated_name;
         $targetFile = $targetDirectory . $uniqueFileName;
         $file_size = formatBytes($_FILES['file']['size']);
         $file_type = $_FILES['file']['type'];
 
-        $sql = "INSERT INTO `files`
+        $sql = "INSERT INTO `$db_name`.`files`
         (
             `name`,
+            `original_name`,
             `path`,
             `size`,
             `type`,
@@ -65,13 +32,14 @@ if (isset($_FILES['file'])) {
             ) 
         VALUES (
             '$genreated_name',       #name
+            '$original_name',       #name
             '$uniqueFileName',       #path
             '$file_size',            #size
             '$folderType',           #type
             '$file_type'             #mime_type
             );";
         // get the file insrted into database
-        $last_sql = "SELECT * FROM `files` WHERE id = LAST_INSERT_ID()";
+        $last_sql = "SELECT * FROM `$db_name`.`files` WHERE id = LAST_INSERT_ID()";
         $insirting = $connection->query($sql);
         $result = $connection->query($last_sql);
         $rows = $result->fetch_assoc();
@@ -89,6 +57,7 @@ if (isset($_FILES['file'])) {
                     "data" => array(
                         "id" => $rows['id'],
                         "name" => $rows['name'],
+                        "original_name" => $rows['original_name'],
                         "size" => $rows['size'],
                         'type' => $rows['mime_type'],
                         "download_url" => $download_url,
