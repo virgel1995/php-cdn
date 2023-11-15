@@ -65,5 +65,5 @@ extension=pgsql
 |   Name   | Method |         Route           |                     QueryStrings               |
 | -------- | ------ | ----------------------- | ---------------------------------------------- |
 |  upload  |  POST  |      /upload/index.php  |                     none                       |
-| download |   GET  |          /download      | file:`number` , base: `bool` , download:`bool` |
+| download |  POST  |          /download      | file:`number` , base: `bool` , download:`bool` |
 |   view   |   GET  |          /view          |                 file : `number`                |

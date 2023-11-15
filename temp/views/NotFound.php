@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error </title>
+    <title>Error - Page Not Found </title>
     <style>
         body {
             display: flex;
@@ -21,5 +20,4 @@
     <div> 404 Not Found </div>
     <div> Page Not Found </div>
 </body>
-
 </html>

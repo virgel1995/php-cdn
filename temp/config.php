@@ -2,11 +2,12 @@
 $request_uri = $_SERVER['REQUEST_URI'];
 set_time_limit(0);
 ini_set('memory_limit', '2048M');
+$APP_NAME = 'CDN';
 $process_urls = array(
-    'main' => '/cdn/temp/',
-    'download' => '/cdn/temp/download',
-    'view' => '/cdn/temp/:slug',
-    'upload' => '/cdn/temp/upload',
+    'main' => '/cdn',
+    'download' => '/cdn/download',
+    'view' => '/cdn/:slug',
+    'upload' => '/cdn/upload',
 );
 // main directory
 $targetDirectory = "./uploads/";

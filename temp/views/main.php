@@ -1,172 +1,7 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>File Upload Form</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            background-color: darkslategrey;
-            color: white;
-            text-align: center;
-            display: flex;
-            /* flex-direction: column; */
-            height: 100vh;
-            align-items: center;
-            justify-content: center;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 50px;
-        }
-
-        label {
-            margin-top: 20px;
-            font-weight: bold;
-            font-size: 18px;
-            text-align: center;
-            width: 300px;
-        }
-
-        input[type="file"] {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            width: 300px;
-        }
-
-        #label {
-            border: 1px dashed;
-            padding: 10px;
-            border-radius: 5px;
-            width: 10em;
-            height: 10em;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-        }
-
-
-        #container {
-            /* border: 1px solid; */
-            padding: 10px;
-            border-radius: 5px;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        #container.dragover {
-            /* background-color: lightblue; */
-            border: 3px dashed;
-            padding: 10px;
-            border-radius: 5px;
-            width: 90vw;
-            height: 90vh;
-
-        }
-
-        #submit-btn {
-            display: none;
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background-color: lightblue;
-            color: black;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #success,
-        #error,
-        #fileData {
-            display: none;
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid;
-            color: white;
-            font-weight: bold;
-            width: 90%;
-
-        }
-
-        #link-container {
-            display: none;
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid;
-            color: white;
-            font-weight: bold;
-            width: 90%;
-            align-items: center;
-            justify-content: space-between;
-            flex-direction: column;
-            gap: 10px;
-
-        }
-
-        #link-container input {
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background-color: lightblue;
-            color: black;
-            font-weight: bold;
-            cursor: pointer;
-            width: 90%;
-            pointer-events: none;
-        }
-
-        #link-container button {
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background-color: lightblue;
-            color: black;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #progress {
-            width: 300px;
-            height: 20px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            color: lightpink;
-        }
-
-        #success-message {
-            width: 100%;
-            height: 50px;
-            background-color: lightblue;
-            position: absolute;
-            color: black;
-            top: 0;
-            left: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-
-        }
-    </style>
-</head>
+<?php
+$title = $APP_NAME;
+include __DIR__ . '/partails/head.php';
+?>
 
 <body>
     <div id="success-message"> </div>
@@ -187,15 +22,9 @@
         <div id="success">
         </div>
         <div id="error"></div>
-
-
     </div>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         const { protocol, host } = window.location;
-
         async function onChange(event) {
             const file = event.target.files[0];
             const fileData = document.getElementById('fileData');
@@ -224,8 +53,11 @@
                         }
                     }
                 });
-                console.log(response)
                 const { status, message, data } = response.data;
+                console.log({
+                    response
+                });
+
                 const fileData = document.getElementById('fileData');
                 fileData.innerHTML = '';
                 fileData.style.display = 'none';
@@ -243,6 +75,7 @@
                 document.getElementById('link-container').style.display = 'flex';
                 document.getElementById('link').value = `${protocol}//${host}${data.view_url}`;
             } catch (error) {
+                console.log({ error });
                 const errorDiv = document.getElementById('error')
                 errorDiv.innerHTML = '';
                 errorDiv.style.display = 'block';
@@ -280,9 +113,11 @@
                 fileInput.dispatchEvent(changeEvent);
             }
         }
-        container.addEventListener('dragover', onDragOver);
-        container.addEventListener('dragleave', onDragLeave);
-        container.addEventListener('drop', onDrop);
+        if (container) {
+            container.addEventListener('dragover', onDragOver);
+            container.addEventListener('dragleave', onDragLeave);
+            container.addEventListener('drop', onDrop);
+        }
         function copyToClipboard() {
             var copyText = document.getElementById("link");
             copyText.select();
@@ -301,6 +136,7 @@
 
         }
     </script>
+
 </body>
 
 </html>

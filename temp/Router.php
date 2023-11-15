@@ -2,7 +2,7 @@
 class Router
 {
     private $routes = [];
-    private $main_url = '/cdn/temp';
+    private $main_url = '/cdn';
     public function addRoute($path, $handler)
     {
         $this->routes[$this->main_url . $path] = $handler;

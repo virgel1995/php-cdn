@@ -27,42 +27,29 @@ if (isset($slug)) {
         "message" => "File Not Found No Query",
     );
 }
+$title = '';
+if ($error) {
+    $title = $error['code'] . ' - ' . $error['message'];
+} else {
+    $title = $APP_NAME . ' - ' . $row['original_name'];
+}
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="<?php echo $process_urls['main'] ?>/assets/style.css">
     <title>
-        <?php
-        if ($error) {
-            echo $error['code'] . ' - ' . $error['message'];
-        } else {
-            echo $row['original_name'];
-        }
-        ?>
+        <?php echo $title ?>
     </title>
-    <style>
-        #download-btn {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background-color: lightblue;
-            color: black;
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
 </head>
-
-<body
-    style="display: flex;justify-content: center;align-items: center; flex-direction: column;min-height: 100vh; background-color: #34495E; color: white;">
+<body>
     <?php
     $serverUrl = $process_urls['download'] . '/' . $fileId;
     if (!$error) {
-        echo '<div id="fileData">';
+        echo '<div id ="fileData-slug">';
         echo '<p>' . 'Name: ' . $row['original_name'] . '</p>' . '<br>';
         echo '<p>' . 'Size: ' . $row['size'] . '</p>' . '<br>';
         echo '<button id="download-btn" onclick="handleDownload()">Download</button>';
@@ -89,21 +76,19 @@ if (isset($slug)) {
                     progressElem.innerHTML = `Downloading: ${percentCompleted}%`;
                 },
             }).then((response) => {
-                console.log(response.data);
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', '<?php echo $row['original_name']; ?>');
+                link.setAttribute('download', `<?php echo $row['original_name']; ?>`);
                 document.body.appendChild(link);
                 link.click();
                 progressElem.innerHTML = 'Download';
                 progressElem.disabled = false
                 progressElem.style.cursor = 'pointer';
                 document.body.removeChild(link);
-                document.getElementById('fileData').innerHTML = 'your download finished';
+                document.getElementById('fileData-slug').innerHTML = 'your download finished';
 
             }).catch((error) => {
-                console.log(error);
                 progressElem.innerHTML = 'Download failed';
             });
         }

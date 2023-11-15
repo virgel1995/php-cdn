@@ -22,7 +22,7 @@ if (isset($_FILES['file'])) {
             $download_url = $process_urls['main'] . "?file=" . $rows['uuid'] . "&base=false&download=true";
             $base_url = $process_urls['main'] . "?file=" . $rows['uuid'] . "&base=true&download=false";
             $file_url = $process_urls['main'] . "/" . $rows['uuid'] . "&base=true&download=false";
-            $view_url = $process_urls['main'] . "" . $rows['uuid'];
+            $view_url = $process_urls['main'] . "/" . $rows['uuid'];
             if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
                 http_response_code(200);
                 header('Content-Type: application/json');

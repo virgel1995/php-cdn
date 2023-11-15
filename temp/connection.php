@@ -7,7 +7,7 @@ class FileDatabase
     public function __construct()
     {
         $directory = "./database";
-        $db_name = $directory . "/database.db";
+        $db_name = $directory . "/database.sqlite3";
         if (!is_dir($directory)) {
             mkdir($directory, 0777, true);
         }
@@ -37,38 +37,54 @@ class FileDatabase
             $this->handleError("error.createNewFile", "Database connection not available.");
         }
         $sql = "INSERT INTO `files`
-        (
-            name,
-            uuid,
-            original_name,
-            path,
-            size,
-            type,
-            mime_type
-        ) 
-        VALUES (
-            '$genreated_name',
-            '$uuid',
-            '$original_name',
-            '$uniqueFileName',
-            '$file_size',
-            '$folderType',
-            '$file_type'
-        )";
-        $result = $this->connection->exec($sql);
+            (
+                name,
+                uuid,
+                original_name,
+                path,
+                size,
+                type,
+                mime_type
+            ) 
+            VALUES (
+                :genreated_name,
+                :uuid,
+                :original_name,
+                :uniqueFileName,
+                :file_size,
+                :folderType,
+                :file_type
+            )";
+    
+        $stmt = $this->connection->prepare($sql);
+    
+        // Bind parameters
+        $stmt->bindValue(':genreated_name', $genreated_name, SQLITE3_TEXT);
+        $stmt->bindValue(':uuid', $uuid, SQLITE3_TEXT);
+        $stmt->bindValue(':original_name', $original_name, SQLITE3_TEXT);
+        $stmt->bindValue(':uniqueFileName', $uniqueFileName, SQLITE3_TEXT);
+        $stmt->bindValue(':file_size', $file_size, SQLITE3_INTEGER);
+        $stmt->bindValue(':folderType', $folderType, SQLITE3_TEXT);
+        $stmt->bindValue(':file_type', $file_type, SQLITE3_TEXT);
+    
+        $result = $stmt->execute();
+    
         if (!$result) {
             $this->handleError("error.createNewFile", "Query failed: " . $this->connection->lastErrorMsg());
         }
+    
         $lastInsertID = $this->connection->lastInsertRowID();
         $last_sql = "SELECT * FROM `files` WHERE id = $lastInsertID";
         $result = $this->connection->query($last_sql);
+    
         if (!$result) {
             $this->handleError("error.createNewFile", "Query failed: " . $this->connection->lastErrorMsg());
         }
+    
         $rows = $result->fetchArray(SQLITE3_ASSOC);
         return $rows;
     }
-
+    
     // Retrieves a file from the database using its UUID
     public function findFileById($uuid)
     {
@@ -109,8 +125,19 @@ class FileDatabase
     {
         http_response_code(500);
         header('Content-Type: application/json');
-        echo json_encode(array("status" => $status, "message" => $message));
-        exit; // Terminate the script
+        echo json_encode(
+            array(
+                "status" => $status,
+                "message" => $message
+            )
+        );
+        var_dump(
+            array(
+                "status" => $status,
+                "message" => $message
+            )
+        );
+        exit;
     }
 }
 
