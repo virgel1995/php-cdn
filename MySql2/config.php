@@ -1,52 +1,28 @@
 <?php
+$request_uri = $_SERVER['REQUEST_URI'];
 set_time_limit(0);
 ini_set('memory_limit', '2048M');
-$server_url = "http://localhost";
+$APP_NAME = 'CDN';
 $process_urls = array(
-    'download' => '/cdn/pg/download',
-    'view' => '/cdn/pg/view',
-    'upload' => '/cdn/pg/upload/index.php',
+    'main' => '/cc',
+    'download' => '/cc/download',
+    'view' => '/cc/:slug',
+    'upload' => '/cc/upload',
 );
-$targetDirectory = "../uploads/";
+// main directory
+$targetDirectory = "./uploads/";
+// sub directorys
 $allowedBase64 = array('images', 'pdf');
 $mediaFiles = array('audio', 'video');
+$applications = array('desktop-app', 'word', 'excel', 'pdf', 'compress', 'other');
 
-
-$db_host = "localhost"; // Change to your database host if necessary
-$db_user = "postgres";
-$db_port = '5432';
-$db_pass = "masterkey";
-$db_name = "cdn";
-
-$connection = pg_connect("host=$db_host port=$db_port dbname=$db_name user=$db_user password=$db_pass");
-if (!$connection) {
-    die("Connection failed: " . pg_last_error());
-}
-$createSchemaQuery = "CREATE SCHEMA IF NOT EXISTS cdn;";
-$result = pg_query($connection, $createSchemaQuery);
-
-if (!$result) {
-    die("Query failed: " . pg_last_error($connection));
-}
-
-$sql = "CREATE TABLE IF NOT EXISTS \"$db_name\".\"files\" 
-(
-    \"id\" SERIAL PRIMARY KEY,
-    \"name\" VARCHAR(255) NULL, 
-    \"original_name\" VARCHAR(255) NULL, 
-    \"path\" VARCHAR(255) NOT NULL,
-    \"size\" VARCHAR(255) NOT NULL, 
-    \"type\" VARCHAR(255) NOT NULL,
-    \"mime_type\" VARCHAR(255) NOT NULL
-)";
-
-// Execute the query using pg_query()
-$result = pg_query($connection, $sql);
-if (!$result) {
-    die("Query failed: " . pg_last_error($connection));
-}
-
-
+/**
+ * Converts a given number of bytes into a human-readable format.
+ *
+ * @param int $bytes The number of bytes to be converted.
+ * @param int $precision The number of decimal places to round the result to. Default is 2.
+ * @return string The formatted string representing the converted value in the appropriate unit.
+ */
 function formatBytes($bytes, $precision = 2)
 {
     $units = array('B', 'KB', 'MB', 'GB', 'TB');
@@ -57,6 +33,12 @@ function formatBytes($bytes, $precision = 2)
     return round($bytes, $precision) . $units[$pow];
 }
 
+/**
+ * Returns the appropriate subdirectory based on the file type.
+ *
+ * @param string $fileType The file type to process.
+ * @return string The subdirectory corresponding to the file type.
+ */
 function process_SubDirectory($fileType)
 {
     $subDirectory = '';
@@ -81,3 +63,4 @@ function process_SubDirectory($fileType)
     }
     return $subDirectory;
 }
+
